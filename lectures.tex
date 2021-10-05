@@ -1,0 +1,131 @@
+\documentclass[12pt]{article}
+
+\usepackage{amsmath,amssymb}
+
+\begin{document}
+\section{Lecture 1}
+The contents of the lectures will be two-fold: the basic contents (concept of Turing machines, computational complexity, complexity classes) and more advanced concepts for people who already this course. Structure involves assignments over 3 deadlines, colloquium on Dec 7th and written exam. Marks are calculated as \(.45a+.3c+.35e\). Main book is Sipser, Introduction to the Theory of Computation, with Arora Barak's Computational Complexity Modern Approach as additional reading. At last, Moore and Mertens' The Nature of Computation as alternative approach to the material. Course shall focus on complexity theory.
+
+\subsection {Basic introduction to concept of Turing Machine}
+The ultimate question is which problems are hard and which are not, in the sense of being non-solvable in polynomial time (relative to input) or not. To start with this, we need certain model of computation, which is strong enough to cover those problems. The one used is Turing machine \(M\) defined as a tuple \((Q,\Sigma,\Gamma,\delta,q_0,q_a,q_r)\) where \(Q\) refers to finite set of states, \(\Sigma\) refers to finite input alphabet, i.e. set of characters on the input of it, \(\Gamma\) is the finite tape alphabet \(\Sigma\subsetneq\Gamma\) for it must contain blank symbol unlike \(\Sigma\) and transition function \(\delta\colon Q\times\Gamma\rightarrow Q\times\Gamma\times\{\mathcal L,\mathcal R\}\), where last set refers to whether transition shifts on the tape (sometimes one adds \(\mathcal N\) as no-go). In addition it is required for there to be \(q_0\in Q\) the starting state, \(q_a\in Q\) the accepting state and \(q_r\neq q_a \in Q\) the rejecting state. Latter two states terminate the work of the machine. Turing machine as such is a function that accepts a certain set \(L\) of words in alphabet \(\Sigma\) called language.
+
+Example (to do): given alphabet \(\Sigma=\{0,1,\sharp\}\), check if input string has structure \(\omega \sharp \omega\) where \(\omega\) is a sequence of 0s and 1s. The useful view in that regard is to record non-empty part of the tape and put state of the machine before the cell machine is on. 
+\subsection{Multiple tapes on a Turing machine}
+To make Turing machine function with multiple tapes, we must have it process \(k\) inputs at once, making \(\delta\) have sets \(\Gamma\) and \(\{\mathcal L,\mathcal R,\mathcal N\}\) raised to the \(k\)-th Cartesian power in the signature.
+That allows to make some algorithms (such as todo one) more straightforward, and sometimes faster (todo one is quadratic in length of input size, two-tape version is linear in the input size). More specifically, if we need to turn multiple tape Turing machine into single one, we can attempt to merge the tapes, and using extended alphabet, mark the cell under machine pointer and place separators between the tapes. Then the single tape machine makes a pass through the merged tape, uses it to generate input for transition function of multitape machine, and does another pass to adjust the fictitous heads (todo: work out exact details). Now, let us assume that \(k\) tape machine works in time \(t(n)\). Then single state machine works in \(O(t(n)^2)\), since individual steps take up \(O(t(n))\) time (and there is \(O(t(n))\) of them).
+\subsection{Universal Turing machine}
+It is not hard to see that you can encode the description of Turing machine in code, particularly binary (todo: think of one such encoding). Then universal Turing machine \(U(\langle M\rangle, w)\) where angle brackets refer to such encoding the machine, while \(w\) is some input word, is a function that interprets \(M\) on the input (namely it's output corresponds to \(M(w)\)).
+\subsection{Complexity classes 101}
+Given Turing machine and it's language, we can consider language \(L(M)\) that is accepted by \(M\) (namely terminates in accepting state on input from \(L(M)\)). Then it is said \(M\) decides \(L(M)\). Then we can use this concept to consider set of languages \(T(t)\) decidable in time \(t(n)\). Class of problems decidable in polynomial time is defined as such in result: \(P=\bigcup T(n^k)\) for every \(k\). Example todo: encoding clique problem. We can also consider \(S(s)\) the set of languages that are decidable using space \(O(s(n))\). Then we can define to class \(PSPACE = \bigcup S(n^k)\), \(EXP\), \(EXPSPACE\) et cetera.
+\section{Lection 2}
+Short recap of past lecture. As a reminder, machine \(M\) can recognize some language \(L(M)\) if it accepts inputs from it, but then \(L(M)\) is decided by \(M\) if \(M\) also rejects inputs from outside of \(L(M)\) (i.e. \(M\) can only decide a language if it terminates on every input and accepts only words from the language). As useful notation, for some set \(\Sigma\) we shall call \(\Sigma^{\star}\) the free monoid over it. Then, we can consider the set \(T(t(n))\) of all languages decidable by \(M\) in time \(O(t(n))\) for some function \(t(n)\) of input length \(n\). Similarly \(S(f(n))\) is the set of all languages decidable by \(M\) using space (i.e. the size of visited tape) \(O(f(n))\) for some function of input length \(f(n)\) (this is slightly different in logarithmic spaces, sa a foreshadowing). Now we can use that to define \(P=\bigcup_{p\in \mathbb Z[n]} T(p)\) and \(PSPACE = \bigcup_{g\in \mathbb Z[n]} S(g)\) and similarly for exponential time and exponential space classes. As last recap, recall that \(g(n)=O(f(n)) \leftrightarrow \exists C\exists N\forall x>N\colon g(x)\leq Cf(x)\). As modification \(g(n)=o(f(n))\leftrightarrow \forall C>0\exists N\forall x>N\colon g(n)< Cf(n)\).
+
+\subsection{Undecidable languages}
+Can every language be part of \(EXP\)? For that consider consider universal Turing machine \(H(\langle M\rangle ,w)\) that accepts the it's inputs \(\langle M\rangle\) and \(w\) if machine \(M\) halts on input \(w\). Then consider a language \(A\) of pairs of encoded machines and inputs that terminate former. Is \(A\) decided by \(H\)? Our claim is that we can't, is known as halting problem, and let us show it.
+
+Consider machine \(D(\langle M\rangle)\), that does not terminate if \(H(\langle M\rangle,\langle M\rangle)\) is accepted, and accepts otherwise. Then, let us consider if \(D(\langle D\rangle)\) should terminate or not? But we obtain the contradictory result in the spirit of Russel's paradox. From this we can only conclude that machine \(H\) cannot exist, making \(A\) undecidable language.
+
+
+\subsection{Time hierarchy theorem}
+Next, consider the question \(T(n)\subsetneq T(n^2)\), i.e. do we have a language that can be decided in quadratic but not linear time? For that consider the function \(t\colon N\to\mathbb N\) of property \(t(n)\geq n\log_2 n\), and we shall call it time constructible if we have a machine \(M\) that can output \(t(n)\) in time \(O(t(n))\) given input of \(n\) letters.
+Let \(t\) be time constructible function. Then there is language \(A\), that is decidable in time \(O(t(n))\) but not in time \(o\left(\frac{t(n)}{log(t(n))}\right)\). As corrollary, it immediately follows our initial claim (consider \(t=n^2\)).
+
+As proof, let us consider Turing machine \(D(w)\), that does following things: computes the length of input \(n=l(w)\), computes \(t(n)\), stores \(\frac {t(n)}{\log_2 t(n)}\) as binary counter, decrements it; if counter hits 0, we reject; in the counter we attempt to interpret \(w\) as Turing Machine encoding \(\langle M\rangle\), strip it of zeroes and run it. If we can't, we reject. If it can, but does not complete before counter hits 0, we still reject. If it halts and accepts, we reject. At last if it halts with rejection during the countdown, we accept.
+
+Then consider language \(A\) decided by \(D(w)\). It is obvious it is decidable in time \(O(t(n))\) by construction. Now, let's assume \(M\) is a Turing machine that decides \(A\) in time \(o\left(\frac{t(n)}{log_2 t(n)}\right)\)  . Then, feeding it right input of form \(M(\langle M\rangle, \langle D\rangle)\) we obtain that languages of \(M\) and \(D\) differ in at least 1 word of this form. For that one may need to properly trim the input in the machine. To be exact, we need to find a word \(w\in A\) of such property that \(w\notin L(M_i)\) for any \(M_i\) decidable in time \(g(n)\approx o\left(\frac{t(n)}{log_2 t(n)}\right)\). For that, consider how long does it take for machine \(D\) to simulate \(M(w)\). Todo: build the illustration to show that it takes times \(O(g(n))\) if \(M\) runs for \(g(n)\). Consider \(M\) that runs in mentioned time, and assume \(L(M)=L(D)\). Then, by our assumptions that \(D\) simulates \(M\) in time \(d g(n)\) for some constant. We can show that given large enough input, time complexity of \(D\) is that of \(M\) but language will be different because by design inputs decided by \(M\) and \(D\) are different.
+
+Corollaries:
+\begin{enumerate}
+\item \(t_1,t_2\colon N\to\mathbb N\) such that \(t_1=o\left(\frac{t_2}{log_2 t_2}\right)\) then \(T(t_1)\subsetneq T(t_2)\).
+\item \(\forall 1\leq \varepsilon_1 < \varepsilon_2\colon T(n^{\varepsilon_1})\subsetneq T(n^{\varepsilon_2})\). This follows from the fact that \(n^{\varepsilon_1}=o\left(\frac{n^{\varepsilon_2}}{log_2 n^{\varepsilon_2}}\right)\)
+\item \(P\subsetneq EXP\)
+\end{enumerate}
+Todo: make the proof proper, this theorem is really a hard thing to do.
+
+\section{Lecture 3}
+This lecture defines the notion of complexity class \(NP\) and \(NP\)-completeness. Let us recall the existing classes: \(P\),\(EXP\) for time and \(PSPACE\),\(EXPSPACE\) for space. Due to time hierarchy theorem, it is immediate consequence that \(P\subsetneq EXP\). Of immediate note is that it is unknown whether \(P=PSPACE\) and \(PSPACE=EXP\) but at least one must be false.
+\subsection{The class NP}
+Consider an example of travelling salesman problem, that has a complete weighted graph \(G(V,E=V\times V,w\colon E\to\mathbb N)\) and some parameter \(k\in\mathbb N\) as the input. Question: is there a path that goes through every vertice once and back to original vertice (the tour or hamiltonian cycle) of total weight \(\sum w \leq k\). It is unknown if it is possible to find such cycle in polynomial time, but consider the task of checking if given solution to this problem is correct. One can see that it would be done in at most polynomial time. To formalize it we introduce class \(NP\).
+
+A \emph{verifier} is an algorithm\footnote{Or Turing machine if we consider one of ways to implement it} \(A(x,y)\colon \Sigma^{\star}\times \Gamma^{\star}\to \{\top,\bot\}\) where \(y\in \Gamma^{\star}\) is a certificate. Then \(A(x,y)\) is said to verify \(x\) iff \(\exists y\colon A(x,y)=\top \).
+As example consider verifier for TSP \(A(x=(G,k),y=\langle v_1,\ldots, v_m\rangle)\). \(m\neq |V|+1\Rightarrow A(x,y)=0\). \(v_1\neq v_m \Rightarrow A(x,y)=0\).  \(\exists i,j\neq m\colon v_i=v_j\Rightarrow A(x,y)=0\). At last if \(\sum_{i=1}^{m-1} w(v_i,v_{i+1})\leq k\colon A(x,y)=1\) and \(A(x,y)=0\) otherwise.
+
+Then, let us say that \(A(x,y)\) verifies language \(\mathcal L\) if \(x\in\mathcal L \Leftrightarrow A(x,y)\text{ verifies } x\). Then we say that \(A\) works in polynomial time if it works in time polynomial in \(|x|\). It automatically means that \(|y|\) is polynomial in \(|x|\). This allows us to define class \(NTIME(t(n))=\{\mathcal L\mid \exists A \text{ verifying } \mathcal L\land TIME(A)=O(t(n))\}\). Then
+\begin{equation}
+  \label{eq:npdef}
+  NP=\bigcup_k NTIME(n^k)
+\end{equation}
+It is important to note that nature of verifier algorithm makes it highly discriminative for questions of constructive answer and non-constructive answers. To formalize, consider \(\mathcal L\subseteq \Sigma^{\star}\) and \(\mathcal {\bar L}\). Then \(coNP = \{\mathcal {\bar L} \mid \mathcal L\in NP\}\).
+
+It is naturally clear that \(P\subseteq NP\). The equality sign is a famous open problem. It is also clear that \(P\subseteq coNP\), in other words \(P\subseteq NP\cap coNP\).
+\subsection{\(NP\)-completeness}
+
+First, let us consider notion of reduction. We say that language \(A\subseteq \Sigma^{\star}\) is polynomial time reducible to \(B\subseteq \Sigma^{\star}\) iff there is a function \(f\colon \Sigma^{\star}\to \Sigma^{\star}\) such that \(\forall w\in\Sigma^{\star}\colon w\in A\Leftrightarrow f(w)\in B\) and said function is computable in polynomial time (in the sense of there being a Turing machine \(M\) that takes \(w\) and produces \(f(w)\) in polynomial time).
+
+As such, we are saying that language \(B\) is \(NP\)-hard if \(\forall A\in NP\colon A\leq_P B\), and it is \(NP\text{-complete}\) if it is also in \(NP\).
+
+The best example of this is Cook-Levin's theorem that satisfiability of arbitrary Boolean formula is \(NP\)-complete, in particular 3-SAT is.
+\section{Lecture 4}
+\subsection{Non-deterministic Turing machines}
+In normal deterministic Turing machine \(M\) we have the tuple of states, input alphabet, internal alphabet, initial state, accept state and reject state, and transition function that takes us from states and letter under the pointer into another state, another letter and moves the pointer. Non-deterministic machine alters it by altering output set of transition function into powerset of \(Q\times\Gamma\times \{L,R\}\). As such, execution of non-deterministic Turing machine will be a tree, and we say that machine accepts an input if it accepts it on at least a single execution path.
+
+Then, the \(\text{TIME(n}\) will be defined as the maximum number of steps taken on any computation branch given any input of length \(n\).
+
+Then we have theorem: \(\mathcal L\in\text{NP}\) iff exists a non-deterministic Turing machine deciding \(\mathcal L\) in polynomial time.
+The first step of proof is to show that given \(\mathcal L\in\text{NP}\), we can build a non-deterministic machine that decides it in polynomial time.
+For that, consider \(A(x,y)\), a verifier for \(\mathcal L\). Then we can non-deterministically generate certificates of length \(|y|\leq n^c\),
+where \(n^c\) is runtime class of verifier. Then return \(A(x,y)\).
+
+In another direction, let us assume we have a non-deterministic Turing machine \(N\) that decides \(\mathcal L\) that runs in polynomial time at most \(n^c\).
+Then, let us encode every execution path into certificate \(y\). Then, if we provide it as certificate, we can modify original machine to just run through given execution path.
+This will give us a verifier algorithm that runs in polynomial time, because original machine runs in polynomial time through any execution path.
+\subsection{Properties of polynomial reducibility}
+\begin{enumerate}
+\item Assume \(A\leq_P B\), and \(B\in P\). Then \(A\in P\). Indeed, we have a function that is computable in polynomial time and Turing machine \(M_B\) for deciding \(B\).
+  Then, we can build a Turing machine that decides \(A\) by running \(M_B\circ f \). One easily sees correctness, and it is clear that it would be running in time at most \(O(n^{cd})\)
+\item Corrolary to previous one is that \(A\leq_P B\) and \(A\notin P\) means that \(B\notin P\).
+\item A theorem about NP-hard and NP-complete problems. Let \(\mathcal L\) is NP-complete. If \(\mathcal L\in P\) then \(P=NP\). Proof follows from definition of NP-completeness and previous property.
+\end{enumerate}
+\subsection{Reducing to NP-complete problem}
+Suppose \(B\) is NP-complete, and \(B\leq_P C\), and \(C\in NP\). Immediately \(C\) is NP-complete, since it is in NP, and every problem in NP reduces first to \(B\) and then to \(C\) in polynomial time.
+As such, we want to know existing NP-complete problems.
+\begin{enumerate}
+\item 3-SAT, satisfiability of 3-CNF, due to Cook-Levin.
+\item Ind-Set, namely given a graph \(G(V,E)\) and number \(k\), to answer if it has independent set of size at least \(k\).
+  To show that it is, we show that it is in NP and show that we can reduce 3-SAT to it. For that, suppose we have \(m\) clauses of 3 literals each.
+  Then we claim that \(k=m\), and \(V=\{l^j_i\mid 1\leq i\leq m, 1\leq j\leq 3\}\) and connect literals in same clause with edge,
+  and add edges for literals that are negations of each other. Let us prove that this reduction is equivalent to Ind-Set problem.
+  For that consider that 3-SAT is satisfiable and has some satisfying assignment. Then there is one true literal in every clause, which we select vertices of.
+  It is easy to see that there should not be edges between them (since they are in different clauses and are all true) and there is exactly \(k\) of them.
+  In another direction, assume we have independent set \(C\in G\), where \(|C|=k=m\). Then, using same reduction, we take the literals and assign true to them.
+\item Bin-Int-Prog, namely given a matrix \(A\) and vector \(b\), is there such \(Ax\leq b\), but \(x\in\{0,1\}\). It is in NP, and we can reduce IndSet to it.
+  The reduction is done by associating vertices of graph with variables and inequality \(x_i+x_j\leq 1\) with every edge between vertices \(i\) and \(j\) and last equation of form \(-\sum x_i\leq -k\)
+\item Hamiltonian path problem in directed graph.
+\end{enumerate}
+\section{Lecture 5}
+\subsection{\(P\subseteq NP\subseteq \text{PSPACE}\subseteq \text{EXP}\)}
+A recap of past material. The first inclusion is obvious, the second can be done via both definitions, but it can also be done via certificate definition. Consider \(L\in NP\), then by existence of certificates we can do a brute force \(\text{PSPACE}\) algorithm that decides \(L\). At last, consider \(L\in\text{PSPACE}\) and let us show it is also in \(\text{EXP}\). Indeed, if it halts, it must go through each configuratoin at most once, and for machine with \(|Q|\) states, alphabet of size \(|\Gamma|\) and tape length \(p(n)\in\mathbb Z[n]\) this configuration count is \(|Q| p(n) |\Gamma|^{p(n)}\) which is bounded by exponential functions above. Unfortunately it is unknown if those inclusions are strict or not.\footnote{\(\text{EXP}\subsetneq \text{SPACE}(2^{\sigma(n)})\) implies \(P=\text{BPP}\)} 
+\subsection{Definition of circuits. Examples in addition and XOR}
+Circuit is defined as directed acyclic graph (DAG for short), with 2 types of vertices: input nodes that has \(\text{fan-in}=0\), gates that have \(1\leq\text{fan-in}\leq 2\) (say \(\land\) and \(\lor\) have in degree of 2 and \(\neg\) has in degree of one) and special output gates that have \(\text{fan-out}=0\).
+Say, circuit that computes XOR has structure of \((x_1\land \neg x_2)\lor (\neg x_1\land x_2)\). Another one is \(\text{maj}(x,y,z)=(x\land y)\lor (x\land z)\lor (y\land z)\). That allows us to implement addition circuit.
+Then size of the circuit is defined as amount of gates, the depth is defined as the longest path from input to output.
+
+
+\subsection{Boolean matrix multiplication. Graph connectivity}
+Given matrix and vector in \({0,1}\) ring, we define \((Mv)_i = \bigvee (M_{ij}\land v_j)\). This is clearly has polynomial circuit size and by application we can use this to solve, say, problem of graph connectivity, as following expression: \((E\lor I_n)^n = 1^{n\times n}\).
+
+\subsection{Every function \(\{0,1\}^n\to\{0,1\}\)is computed by a circuit of size \(\leq n 2^n\)}
+
+Indeed, let us build such circuit for some such function \(f\) by virtue of building a circuit computing DNF or CNF of the function.
+
+\subsection{Some functions are only computed by circuits of size \(2^{\Omega(n)}\)}
+For that we first fix a notation to describe circuits and count various descriptions. We have circuit as a list of at most \(s\) nodes with input of \(\{0,1\}^n\), there is at most \(3(n+s-1)^2\) variants of such for each node.
+So, overall circuit count is of order \(3(n+s-1)^{2s}\), while there are \(2^{2^n}\) functions for \(n\) inputs. As such, given fixed \(s\) if it is not big enough, there will be a function not computed by circuit of size \(s\).
+Estimating one against the other, we see that such \(s\) is bounded above by \(2^{\alpha n} \) for some \(\alpha < 1\). More precisely, \(\alpha = 0.5\)
+
+\subsection{Defining \(P/\text{poly}\)}
+We say that language \(L\subseteq \{0,1\}^\star\) is in \(P/\text{poly}\) if there is a polynomial size scheme to decide if word is in the language for every input of length \(n\).
+
+\subsection{\(P\subseteq P/\text{poly}\)}
+
+\end{document}
